@@ -1,0 +1,9 @@
+services:
+- type: pserv
+  name: redis
+  env: docker
+  region: frankfurt
+  disk:
+    name: data
+    mountPath: /var/lib/redis
+    sizeGB: 10
