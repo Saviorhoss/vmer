@@ -33,7 +33,7 @@ from helpers.broadcast import broadcast_handler
 from helpers.ffmpeg import MergeVideo, generate_screen_shots, cult_small_video
 from asyncio.exceptions import TimeoutError
 from pyrogram.errors import FloodWait, UserNotParticipant, MessageNotModified
-from pyrogram.enum import ParseMode
+from pyrogram import ParseMode
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, CallbackQuery, InputMediaPhoto
 
 QueueDB = {}
