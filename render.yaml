@@ -3,7 +3,5 @@ services:
   name: redis
   env: docker
   region: frankfurt
-  disk:
-    name: data
-    mountPath: /var/lib/redis
+  plan: free
     sizeGB: 10
