@@ -9,4 +9,4 @@ aiofiles
 psutil
 pyromod
 humanfriendly
-redis
+enum34
