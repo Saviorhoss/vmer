@@ -6,7 +6,7 @@ import os
 class Config(object):
     API_ID = int(os.environ.get("API_ID", 14699743))
     API_HASH = os.environ.get("API_HASH", "0cef89ed2c8025c16d2b4d42a1b8d792")
-    BOT_TOKEN = os.environ.get("BOT_TOKEN", "5466053464:AAF9Ed9gYvT-jXozzvua015J4OQ7sp8KDLk")
+    BOT_TOKEN = os.environ.get("BOT_TOKEN", "5115356918:AAFH3T-1f2x4ZdikRQnNoOXXgonLUlwryAQ")
     SESSION_NAME = os.environ.get("SESSION_NAME", "HerBot")
     UPDATES_CHANNEL = os.environ.get("UPDATES_CHANNEL", "-1001625277697")
     LOG_CHANNEL = os.environ.get("LOG_CHANNEL", "-1001788952875")
