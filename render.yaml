@@ -4,4 +4,3 @@ services:
   env: docker
   region: frankfurt
   plan: free
-    sizeGB: 10
