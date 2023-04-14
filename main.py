@@ -21,6 +21,7 @@ from helpers.check_gap import CheckTimeGap
 from helpers.database.access_db import db
 from helpers.database.add_user import AddUserToDatabase
 from helpers.uploader import UploadVideo
+from helpers.settings import OpenSettings
 from helpers.forcesub import ForceSub
 from hachoir.metadata import extractMetadata
 from helpers.display_progress import progress_for_pyrogram, humanbytes
@@ -95,7 +96,7 @@ async def videos_handler(bot: Client, m: Message):
         if (len(QueueDB.get(m.from_user.id)) >= 0) and (len(QueueDB.get(m.from_user.id)) <= Config.MAX_VIDEOS):
             QueueDB.get(m.from_user.id).append(m.message_id)
             if ReplyDB.get(m.from_user.id, None) is not None:
-                await bot.delete_messages(chat_id=m.chat.id, message_ids=ReplyDB.get(m.from_user.id))
+                await bot.delete_messages(chat_id=message.chat_id, message_ids=ReplyDB.get(m.from_user.id))
             if FormtDB.get(m.from_user.id, None) is None:
                 FormtDB.update({m.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
             await asyncio.sleep(Config.TIME_GAP)
@@ -260,10 +261,10 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
         FormtDB.update({cb.from_user.id: None})
         await cb.message.edit("Successfully Cancelled!")
     elif cb.data.startswith("showFileName_"):
-        message_ = await bot.get_messages(chat_id=cb.message.chat.id, message_ids=int(cb.data.split("_", 1)[-1]))
+        message_ = await bot.get_messages(chat_id=cb.message.chat_id, message_ids=int(cb.data.split("_", 1)[-1]))
         try:
             await bot.send_message(
-                chat_id=cb.message.chat.id,
+                chat_id=cb.message.chat_id,
                 text="This File Sir!",
                 reply_to_message_id=message_.message_id,
                 reply_markup=InlineKeyboardMarkup(
@@ -281,7 +282,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
     elif "refreshFsub" in cb.data:
         if Config.UPDATES_CHANNEL:
             try:
-                user = await bot.get_chat_member(chat_id=(int(Config.UPDATES_CHANNEL) if Config.UPDATES_CHANNEL.startswith("-100") else Config.UPDATES_CHANNEL), user_id=cb.message.chat.id)
+                user = await bot.get_chat_member(chat_id=(int(Config.UPDATES_CHANNEL) if Config.UPDATES_CHANNEL.startswith("-100") else Config.UPDATES_CHANNEL), user_id=cb.message.chat_id)
                 if user.status == "kicked":
                     await cb.message.edit(
                         text="Sorry Sir, You are Banned to use me. Contact my [Support Channel](https://t.me/danisooper).",
@@ -364,7 +365,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
         if cb.data.split("_", 1)[-1] == "Yes":
             await cb.message.edit("Okay Unkil,\nSend me new file name!")
             try:
-                ask_: Message = await bot.listen(cb.message.chat.id, timeout=300)
+                ask_: Message = await bot.listen(cb.message.chat_id, timeout=300)
                 if ask_.text:
                     ascii_ = e = ''.join([i if (i in string.digits or i in string.ascii_letters or i == " ") else "" for i in ask_.text])
                     new_file_name = f"{Config.DOWN_PATH}/{str(cb.from_user.id)}/{ascii_.replace(' ', '_').rsplit('.', 1)[0]}.{FormtDB.get(cb.from_user.id).lower()}"
@@ -486,7 +487,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
                 try:
                     c_time = time.time()
                     await bot.send_video(
-                        chat_id=cb.message.chat.id,
+                        chat_id=cb.message.chat_id,
                         video=sample_video,
                         thumb=video_thumbnail,
                         width=sam_vid_width,
