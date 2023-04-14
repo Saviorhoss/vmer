@@ -36,7 +36,7 @@ ReplyDB = {}
 FormtDB = {}
 NubBot = Client(
     session_name=Config.SESSION_NAME,
-    api_id=int(Config.API_ID),
+    api_id=Config.API_ID,
     api_hash=Config.API_HASH,
     bot_token=Config.BOT_TOKEN
 )
@@ -65,17 +65,6 @@ def check(message):
         chat_id = message.chat.id
         user_id = message.from_user.id
         message_id = message.id
-        
-        # Log message
-        logging.info(f'Checking message object for chat ID, user ID, and message ID. Chat ID: {chat_id}, User ID: {user_id}, Message ID: {message_id}')
-        
-        # Return tuple containing chat ID, user ID, and message ID
-        return (chat_id, user_id, message_id)
-    except AttributeError:
-        # Log error
-        logging.error('Message object has no attribute "id".')
-        # Raise error
-        raise AttributeError('Message object has no attribute "id".')
         
 @NubBot.on_message(filters.private & filters.command("start"))
 async def start_handler(bot: Client, m: Message):
@@ -112,8 +101,8 @@ async def videos_handler(bot: Client, m: Message):
         await m.reply_text("This Video Format not Allowed!\nOnly send MP4 or MKV or WEBM.", quote=True)
         return
     if QueueDB.get(message.from_user.id, None) is None:
-        FormtDB.update({message.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
-    if (FormtDB.get(message.from_user.id, None) is not None) and (media.file_name.rsplit(".", 1)[-1].lower() != FormtDB.get(message.from_user.id)):
+        FormatDB.update({message.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
+    if (FormtaDB.get(message.from_user.id, None) is not None) and (media.file_name.rsplit(".", 1)[-1].lower() != FormtDB.get(message.from_user.id)):
         await m.reply_text(f"First you sent a {FormtDB.get(message.from_user.id).upper()} video so now send only that type of video.", quote=True)
         return
     input_ = f"{Config.DOWN_PATH}/{message.from_user.id}/input.txt"
@@ -132,8 +121,8 @@ async def videos_handler(bot: Client, m: Message):
             QueueDB.get(message.from_user.id).append(m.message_id)
             if ReplyDB.get(message.from_user.id, None) is not None:
                 await bot.delete_messages(chat_id=message.chat_id, message_ids=ReplyDB.get(message.from_user.id))
-            if FormtDB.get(message.from_user.id, None) is None:
-                FormtDB.update({message.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
+            if FormatDB.get(message.from_user.id, None) is None:
+                FormatDB.update({message.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
             await asyncio.sleep(Config.TIME_GAP)
             if len(QueueDB.get(message.from_user.id)) == Config.MAX_VIDEOS:
                 MessageText = "𝙊𝙠𝙖𝙮 , 𝙉𝙤𝙬 𝙅𝙪𝙨𝙩 𝙋𝙧𝙚𝙨𝙨 𝙈𝙚𝙧𝙜𝙚 𝙉𝙤𝙬 𝘽𝙪𝙩𝙩𝙤𝙣 𝙋𝙡𝙤𝙭!"
@@ -293,7 +282,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
         await cb.message.edit("Trying to Delete Working DIR ...")
         await delete_all(root=f"{Config.DOWN_PATH}/{cb.from_user.id}/")
         QueueDB.update({cb.from_user.id: []})
-        FormtDB.update({cb.from_user.id: None})
+        FormatDB.update({cb.from_user.id: None})
         await cb.message.edit("Successfully Cancelled!")
     elif cb.data.startswith("showFileName_"):
         message_ = await bot.get_messages(chat_id=cb.message.chat_id, message_ids=int(cb.data.split("_", 1)[-1]))
@@ -428,7 +417,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
         except:
             await delete_all(root=f"{Config.DOWN_PATH}/{cb.from_user.id}/")
             QueueDB.update({cb.from_user.id: []})
-            FormtDB.update({cb.from_user.id: None})
+            FormatDB.update({cb.from_user.id: None})
             
             file_generator_command = [
                 "ffmpeg",
@@ -546,7 +535,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
         await cb.message.delete(True)
         await delete_all(root=f"{Config.DOWN_PATH}/{cb.from_user.id}/")
         QueueDB.update({cb.from_user.id: []})
-        FormtDB.update({cb.from_user.id: None})
+        FormatDB.update({cb.from_user.id: None})
     elif "closeMeh" in cb.data:
         await cb.message.delete(True)
         await cb.message.reply_to_message.delete(True)
