@@ -41,30 +41,6 @@ NubBot = Client(
     bot_token=Config.BOT_TOKEN
 )
 
-
-
-# Set up logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S',
-                    stream=sys.stdout)
-
-# Define function to check message
-def check(message):
-    """
-    This function checks a message object for its chat ID, user ID, and message ID.
-    
-    Parameters:
-    message (object): A message object.
-    
-    Returns:
-    tuple: A tuple containing the chat ID, user ID, and message ID.
-    """
-    try:
-        # Get chat ID, user ID, and message ID from message object
-        chat_id = message.chat.id
-        user_id = message.from_user.id
-        message_id = message.id
         
 @NubBot.on_message(filters.private & filters.command("start"))
 async def start_handler(bot: Client, m: Message):
