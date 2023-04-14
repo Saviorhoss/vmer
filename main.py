@@ -1,8 +1,4 @@
-# (c) @Savior_128
-# This is very simple Telegram Videos Merge Bot.
-# Coded by a Nub.
-# Don't Laugh seeing the codes.
-# Me learning.
+
 
 import os
 import sys
@@ -61,7 +57,6 @@ async def start_handler(bot: Client, m: Message):
                 [InlineKeyboardButton("𝐷𝑒𝑣𝑒𝑙𝑜𝑝𝑒𝑟 - 𝑆𝑎𝑣𝑖𝑜𝑟_128", url="https://t.me/Savior_128")],
                 [InlineKeyboardButton("𝑆𝑢𝑝𝑝𝑜𝑟𝑡 𝐶ℎ𝑎𝑛𝑛𝑒𝑙", url="https://t.me/danisooper"),
                  InlineKeyboardButton("𝑂𝑡ℎ𝑒𝑟 𝐵𝑜𝑡", url="Siskiuploaderbot.t.me")],
-                [InlineKeyboardButton("𝑂𝑝𝑒𝑛 𝑆𝑒𝑡𝑡𝑖𝑛𝑔𝑠", callback_data="openSettings")],
                 [InlineKeyboardButton("𝐶𝑙𝑜𝑠𝑒", callback_data="closeMeh")]
             ]
         )
@@ -129,49 +124,10 @@ async def photo_handler(bot: Client, m: Message):
     Fsub = await ForceSub(bot, m)
     if Fsub == 400:
         return
-    editable = await m.reply_text("Saving Thumbnail to Database ...", quote=True)
-    await db.set_thumbnail(m.from_user.id, thumbnail=m.photo.file_id)
-    await editable.edit(
-        text="Thumbnail Saved Successfully!",
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton("Show Thumbnail", callback_data="showThumbnail")],
-                [InlineKeyboardButton("Delete Thumbnail", callback_data="deleteThumbnail")]
-            ]
-        )
-    )
-
-
-@NubBot.on_message(filters.private & filters.command("settings"))
-async def settings_handler(bot: Client, m: Message):
-    await AddUserToDatabase(bot, m)
-    Fsub = await ForceSub(bot, m)
-    if Fsub == 400:
-        return
-    editable = await m.reply_text("Please Wait ...", quote=True)
-    await OpenSettings(editable, m.from_user.id)
-
-
+  
 @NubBot.on_message(filters.private & filters.command("broadcast") & filters.reply & filters.user(Config.BOT_OWNER) & ~filters.edited)
 async def _broadcast(_, m: Message):
     await broadcast_handler(m)
-
-
-@NubBot.on_message(filters.private & filters.command("status") & filters.user(Config.BOT_OWNER))
-async def _status(_, m: Message):
-    total, used, free = shutil.disk_usage(".")
-    total = humanbytes(total)
-    used = humanbytes(used)
-    free = humanbytes(free)
-    cpu_usage = psutil.cpu_percent()
-    ram_usage = psutil.virtual_memory().percent
-    disk_usage = psutil.disk_usage('/').percent
-    total_users = await db.total_users_count()
-    await m.reply_text(
-        text=f"**Total Disk Space:** {total} \n**Used Space:** {used}({disk_usage}%) \n**Free Space:** {free} \n**CPU Usage:** {cpu_usage}% \n**RAM Usage:** {ram_usage}%\n\n**Total Users in DB:** `{total_users}`",
-        parse_mode="Markdown",
-        quote=True
-    )
 
 
 @NubBot.on_message(filters.private & filters.command("check") & filters.user(Config.BOT_OWNER))
@@ -368,31 +324,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Developer - Savior_128", url="https://t.me/Savior_128"), InlineKeyboardButton("Support Channel", url="https://t.me/danisooper")], [InlineKeyboardButton("𝑂𝑡ℎ𝑒𝑟 𝐵𝑜𝑡", url="Siskiuploaderbot.t.me")]]),
             disable_web_page_preview=True
         )
-    elif "showThumbnail" in cb.data:
-        db_thumbnail = await db.get_thumbnail(cb.from_user.id)
-        if db_thumbnail is not None:
-            await cb.answer("Sending Thumbnail ...", show_alert=True)
-            await bot.send_photo(
-                chat_id=cb.message.chat.id,
-                photo=db_thumbnail,
-                reply_markup=InlineKeyboardMarkup(
-                    [
-                        [InlineKeyboardButton("Delete Thumbnail", callback_data="deleteThumbnail")]
-                    ]
-                )
-            )
-        else:
-            await cb.answer("No Thumbnail Found for you in Database!")
-    elif "deleteThumbnail" in cb.data:
-        await db.set_thumbnail(cb.from_user.id, thumbnail=None)
-        await cb.message.edit("Thumbnail Deleted from Database!")
-    elif "triggerUploadMode" in cb.data:
-        upload_as_doc = await db.get_upload_as_doc(cb.from_user.id)
-        if upload_as_doc is False:
-            await db.set_upload_as_doc(cb.from_user.id, upload_as_doc=True)
-        elif upload_as_doc is True:
-            await db.set_upload_as_doc(cb.from_user.id, upload_as_doc=False)
-        await OpenSettings(m=cb.message, user_id=cb.from_user.id)
+    
     elif "showQueueFiles" in cb.data:
         try:
             markup = await MakeButtons(bot, cb.message, QueueDB)
@@ -426,13 +358,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
         generate_sample_video = await db.get_generate_sample_video(cb.from_user.id)
         if generate_sample_video is True:
             await db.set_generate_sample_video(cb.from_user.id, generate_sample_video=False)
-        elif generate_sample_video is False:
-            await db.set_generate_sample_video(cb.from_user.id, generate_sample_video=True)
-        await OpenSettings(cb.message, user_id=cb.from_user.id)
-    elif "openSettings" in cb.data:
-        await OpenSettings(cb.message, cb.from_user.id)
-    elif cb.data.startswith("renameFile_"):
-        if (QueueDB.get(cb.from_user.id, None) is None) or (QueueDB.get(cb.from_user.id) == []):
+        
             await cb.answer("Sorry Unkil, Your Queue is Empty!", show_alert=True)
             return
         merged_vid_path = f"{Config.DOWN_PATH}/{str(cb.from_user.id)}/[@Savior_128]_Merged.{FormtDB.get(cb.from_user.id).lower()}"
@@ -468,19 +394,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
             await delete_all(root=f"{Config.DOWN_PATH}/{cb.from_user.id}/")
             QueueDB.update({cb.from_user.id: []})
             FormtDB.update({cb.from_user.id: None})
-            await cb.message.edit("The Merged Video Corrupted!\nTry Again Later.")
-            return
-        video_thumbnail = None
-        db_thumbnail = await db.get_thumbnail(cb.from_user.id)
-        if db_thumbnail is not None:
-            video_thumbnail = await bot.download_media(message=db_thumbnail, file_name=f"{Config.DOWN_PATH}/{str(cb.from_user.id)}/thumbnail/")
-            Image.open(video_thumbnail).convert("RGB").save(video_thumbnail)
-            img = Image.open(video_thumbnail)
-            img.resize((width, height))
-            img.save(video_thumbnail, "JPEG")
-        else:
-            video_thumbnail = Config.DOWN_PATH + "/" + str(cb.from_user.id) + "/" + str(time.time()) + ".jpg"
-            ttl = random.randint(0, int(duration) - 1)
+            
             file_generator_command = [
                 "ffmpeg",
                 "-ss",
