@@ -21,7 +21,6 @@ from helpers.check_gap import CheckTimeGap
 from helpers.database.access_db import db
 from helpers.database.add_user import AddUserToDatabase
 from helpers.uploader import UploadVideo
-from helpers.settings import OpenSettings
 from helpers.forcesub import ForceSub
 from hachoir.metadata import extractMetadata
 from helpers.display_progress import progress_for_pyrogram, humanbytes
