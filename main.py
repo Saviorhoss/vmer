@@ -8,7 +8,6 @@ import shutil
 import psutil
 import random
 import asyncio
-import logging
 from PIL import Image
 import pyromod.listen
 from datetime import datetime
@@ -33,7 +32,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, 
 
 QueueDB = {}
 ReplyDB = {}
-FormtDB = {}
+FormatDB = {}
 NubBot = Client(
     session_name=Config.SESSION_NAME,
     api_id=Config.API_ID,
@@ -78,8 +77,8 @@ async def videos_handler(bot: Client, m: Message):
         return
     if QueueDB.get(message.from_user.id, None) is None:
         FormatDB.update({message.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
-    if (FormtaDB.get(message.from_user.id, None) is not None) and (media.file_name.rsplit(".", 1)[-1].lower() != FormtDB.get(message.from_user.id)):
-        await m.reply_text(f"First you sent a {FormtDB.get(message.from_user.id).upper()} video so now send only that type of video.", quote=True)
+    if (FormtaDB.get(message.from_user.id, None) is not None) and (media.file_name.rsplit(".", 1)[-1].lower() != FormatDB.get(message.from_user.id)):
+        await m.reply_text(f"First you sent a {FormatDB.get(message.from_user.id).upper()} video so now send only that type of video.", quote=True)
         return
     input_ = f"{Config.DOWN_PATH}/{message.from_user.id}/input.txt"
     if os.path.exists(input_):
@@ -207,7 +206,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
             except:
                 await delete_all(root=f"{Config.DOWN_PATH}/{cb.from_user.id}/")
                 QueueDB.update({cb.from_user.id: []})
-                FormtDB.update({cb.from_user.id: None})
+                FormatDB.update({cb.from_user.id: None})
                 await cb.message.edit("Video Corrupted!\nTry Again Later.")
                 return
         __cache = list()
@@ -225,7 +224,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
             input_file=input_,
             user_id=cb.from_user.id,
             message=cb.message,
-            format_=FormtDB.get(cb.from_user.id, "mkv")
+            format_=FormatDB.get(cb.from_user.id, "mkv")
         )
         if merged_vid_path is None:
             await cb.message.edit(
@@ -233,7 +232,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
             )
             await delete_all(root=f"{Config.DOWN_PATH}/{cb.from_user.id}/")
             QueueDB.update({cb.from_user.id: []})
-            FormtDB.update({cb.from_user.id: None})
+            FormatDB.update({cb.from_user.id: None})
             return
         await cb.message.edit("Successfully Merged Video!")
         await asyncio.sleep(Config.TIME_GAP)
@@ -243,7 +242,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
             await UploadToStreamtape(file=merged_vid_path, editable=cb.message, file_size=file_size)
             await delete_all(root=f"{Config.DOWN_PATH}/{cb.from_user.id}/")
             QueueDB.update({cb.from_user.id: []})
-            FormtDB.update({cb.from_user.id: None})
+            FormatDB.update({cb.from_user.id: None})
             return
         await cb.message.edit(
             text="Do you like to rename file?\nChoose a Button from below:",
@@ -361,14 +360,14 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
         
             await cb.answer("Sorry Unkil, Your Queue is Empty!", show_alert=True)
             return
-        merged_vid_path = f"{Config.DOWN_PATH}/{str(cb.from_user.id)}/[@Savior_128]_Merged.{FormtDB.get(cb.from_user.id).lower()}"
+        merged_vid_path = f"{Config.DOWN_PATH}/{str(cb.from_user.id)}/[@Savior_128]_Merged.{FormatDB.get(cb.from_user.id).lower()}"
         if cb.data.split("_", 1)[-1] == "Yes":
             await cb.message.edit("Okay Unkil,\nSend me new file name!")
             try:
                 ask_: Message = await bot.listen(cb.message.chat_id, timeout=300)
                 if ask_.text:
                     ascii_ = e = ''.join([i if (i in string.digits or i in string.ascii_letters or i == " ") else "" for i in ask_.text])
-                    new_file_name = f"{Config.DOWN_PATH}/{str(cb.from_user.id)}/{ascii_.replace(' ', '_').rsplit('.', 1)[0]}.{FormtDB.get(cb.from_user.id).lower()}"
+                    new_file_name = f"{Config.DOWN_PATH}/{str(cb.from_user.id)}/{ascii_.replace(' ', '_').rsplit('.', 1)[0]}.{FormatDB.get(cb.from_user.id).lower()}"
                     await cb.message.edit(f"Renaming File Name to `{new_file_name.rsplit('/', 1)[-1]}`")
                     os.rename(merged_vid_path, new_file_name)
                     await asyncio.sleep(2)
@@ -463,7 +462,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
                 output_directory=sample_vid_dir,
                 start_time=ttl,
                 end_time=(ttl + 10),
-                format_=FormtDB.get(cb.from_user.id)
+                format_=FormatDB.get(cb.from_user.id)
             )
             if sample_video is None:
                 await cb.message.edit("Failed to Generate Sample Video!")
