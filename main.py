@@ -8,6 +8,7 @@ import shutil
 import psutil
 import random
 import asyncio
+import logging
 from PIL import Image
 import pyromod.listen
 from datetime import datetime
@@ -41,6 +42,41 @@ NubBot = Client(
 )
 
 
+
+# Set up logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(levelname)s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    stream=sys.stdout)
+
+# Define function to check message
+def check(message):
+    """
+    This function checks a message object for its chat ID, user ID, and message ID.
+    
+    Parameters:
+    message (object): A message object.
+    
+    Returns:
+    tuple: A tuple containing the chat ID, user ID, and message ID.
+    """
+    try:
+        # Get chat ID, user ID, and message ID from message object
+        chat_id = message.chat.id
+        user_id = message.from_user.id
+        message_id = message.id
+        
+        # Log message
+        logging.info(f'Checking message object for chat ID, user ID, and message ID. Chat ID: {chat_id}, User ID: {user_id}, Message ID: {message_id}')
+        
+        # Return tuple containing chat ID, user ID, and message ID
+        return (chat_id, user_id, message_id)
+    except AttributeError:
+        # Log error
+        logging.error('Message object has no attribute "id".')
+        # Raise error
+        raise AttributeError('Message object has no attribute "id".')
+        
 @NubBot.on_message(filters.private & filters.command("start"))
 async def start_handler(bot: Client, m: Message):
     await AddUserToDatabase(bot, m)
