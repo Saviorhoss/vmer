@@ -75,31 +75,31 @@ async def videos_handler(bot: Client, m: Message):
     if media.file_name.rsplit(".", 1)[-1].lower() not in ["mp4", "mkv", "webm"]:
         await m.reply_text("This Video Format not Allowed!\nOnly send MP4 or MKV or WEBM.", quote=True)
         return
-    if QueueDB.get(m.from_user.id, None) is None:
-        FormtDB.update({m.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
-    if (FormtDB.get(m.from_user.id, None) is not None) and (media.file_name.rsplit(".", 1)[-1].lower() != FormtDB.get(m.from_user.id)):
-        await m.reply_text(f"First you sent a {FormtDB.get(m.from_user.id).upper()} video so now send only that type of video.", quote=True)
+    if QueueDB.get(message.from_user.id, None) is None:
+        FormtDB.update({message.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
+    if (FormtDB.get(message.from_user.id, None) is not None) and (media.file_name.rsplit(".", 1)[-1].lower() != FormtDB.get(message.from_user.id)):
+        await m.reply_text(f"First you sent a {FormtDB.get(message.from_user.id).upper()} video so now send only that type of video.", quote=True)
         return
-    input_ = f"{Config.DOWN_PATH}/{m.from_user.id}/input.txt"
+    input_ = f"{Config.DOWN_PATH}/{message.from_user.id}/input.txt"
     if os.path.exists(input_):
         await m.reply_text("Sorry Unkil,\nAlready One in Progress!\nDon't Spam Plox.")
         return
-    isInGap, sleepTime = await CheckTimeGap(m.from_user.id)
+    isInGap, sleepTime = await CheckTimeGap(message.from_user.id)
     if isInGap is True:
         await m.reply_text(f"Sorry Sir,\nNo Flooding Allowed!\nSend Video After `{str(sleepTime)}s` !!", quote=True)
     else:
         editable = await m.reply_text("Please Wait ...", quote=True)
         MessageText = "🇴 🇰 ,\n𝙉𝙤𝙬 𝙎𝙚𝙣𝙙 𝙈𝙚 𝙉𝙚𝙭𝙩 𝙑𝙞𝙙𝙚𝙤 𝙤𝙧 𝙋𝙧𝙚𝙨𝙨 𝙈𝙚𝙧𝙜𝙚 𝙉𝙤𝙬 𝘽𝙪𝙩𝙩𝙤𝙣!"
-        if QueueDB.get(m.from_user.id, None) is None:
-            QueueDB.update({m.from_user.id: []})
-        if (len(QueueDB.get(m.from_user.id)) >= 0) and (len(QueueDB.get(m.from_user.id)) <= Config.MAX_VIDEOS):
-            QueueDB.get(m.from_user.id).append(m.message_id)
-            if ReplyDB.get(m.from_user.id, None) is not None:
-                await bot.delete_messages(chat_id=message.chat_id, message_ids=ReplyDB.get(m.from_user.id))
-            if FormtDB.get(m.from_user.id, None) is None:
-                FormtDB.update({m.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
+        if QueueDB.get(message.from_user.id, None) is None:
+            QueueDB.update({message.from_user.id: []})
+        if (len(QueueDB.get(message.from_user.id)) >= 0) and (len(QueueDB.get(message.from_user.id)) <= Config.MAX_VIDEOS):
+            QueueDB.get(message.from_user.id).append(m.message_id)
+            if ReplyDB.get(message.from_user.id, None) is not None:
+                await bot.delete_messages(chat_id=message.chat_id, message_ids=ReplyDB.get(message.from_user.id))
+            if FormtDB.get(message.from_user.id, None) is None:
+                FormtDB.update({message.from_user.id: media.file_name.rsplit(".", 1)[-1].lower()})
             await asyncio.sleep(Config.TIME_GAP)
-            if len(QueueDB.get(m.from_user.id)) == Config.MAX_VIDEOS:
+            if len(QueueDB.get(message.from_user.id)) == Config.MAX_VIDEOS:
                 MessageText = "𝙊𝙠𝙖𝙮 , 𝙉𝙤𝙬 𝙅𝙪𝙨𝙩 𝙋𝙧𝙚𝙨𝙨 𝙈𝙚𝙧𝙜𝙚 𝙉𝙤𝙬 𝘽𝙪𝙩𝙩𝙤𝙣 𝙋𝙡𝙤𝙭!"
             markup = await MakeButtons(bot, m, QueueDB)
             await editable.edit(text="𝒀𝒐𝒖𝒓 𝑽𝒊𝒅𝒆𝒐 𝑨𝒅𝒅𝒆𝒅 𝒕𝒐 𝑸𝒖𝒆𝒖𝒆!")
@@ -108,8 +108,8 @@ async def videos_handler(bot: Client, m: Message):
                 reply_markup=InlineKeyboardMarkup(markup),
                 quote=True
             )
-            ReplyDB.update({m.from_user.id: reply_.message_id})
-        elif len(QueueDB.get(m.from_user.id)) > Config.MAX_VIDEOS:
+            ReplyDB.update({message.from_user.id: reply_.message_id})
+        elif len(QueueDB.get(message.from_user.id)) > Config.MAX_VIDEOS:
             markup = await MakeButtons(bot, m, QueueDB)
             await editable.edit(
                 text=f"Sorry Unkil,\nMax {str(Config.MAX_VIDEOS)} ᴠɪᴅᴇᴏꜱ ᴀʟʟᴏᴡᴇᴅ ᴛᴏ ᴍᴇʀɢᴇ ᴛᴏɢᴇᴛʜᴇʀ!\nᴘʀᴇꜱꜱ **ᴍᴇʀɢᴇ ɴᴏᴡ** ʙᴜᴛᴛᴏɴ ɴᴏᴡ!",
