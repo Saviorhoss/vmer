@@ -43,14 +43,10 @@ NubBot = Client(
 @NubBot.on_message(filters.private & filters.command("start"))
 
 async def start_handler(bot: Client, m: Message):
-    
-await AddUserToDatabase(bot, m) 
-
+    await AddUserToDatabase(bot, m) 
 Fsub = await ForceSub(bot, m)
-
 if Fsub == 400:
-    
-return
+    return
 
 await m.reply_text(
     text = Config.START_TEXT,
