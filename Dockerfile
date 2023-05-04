@@ -1,7 +1,5 @@
 FROM python:3.9
 
-WORKDIR /usr/src/app
-
 RUN apt -qq update && apt -qq install -y git ffmpeg
 
 RUN python -m pip install --upgrade pip
