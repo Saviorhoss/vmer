@@ -1,0 +1,16 @@
+name: python-getting-started
+build:
+  worker:
+    image: savior128/vimerg:tagname
+    context: .
+deploy:
+  - kubectl apply -f k8s.yml
+dev:
+  worker:
+    command: bash
+    sync:
+      - .:/usr/src/app
+    reverse:
+      - 9000:9000
+    volumes:
+      - /root/.cache/pip

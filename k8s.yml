@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: video_merge
+    spec:
+      containers:
+      - image: savior128/vimerg:tagname
+        name: worker
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world
+spec:
+  type: ClusterIP
+  ports:
+  - name: "worker"
+    port: 8080
+  selector:
+    app: hello-world
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: worker
+  annotations:
+    dev.okteto.com/generate-host: worker
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: worker
+                port:
+                  number: 8080
+            path: /
+            pathType: ImplementationSpecific
