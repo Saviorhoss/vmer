@@ -1,12 +1,17 @@
 FROM python:3.9
 
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+COPY . /app
+
+WORKDIR /app
+
 RUN apt -qq update && apt -qq install -y git ffmpeg
-
+COPY . .
+COPY requirements.txt .
 RUN python -m pip install --upgrade pip
+RUN pip3 install --no-cache-dir -r requirements.txt
+COPY . .
 
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
-
-EXPOSE 8080
-
-CMD ["python", "main.py" ]
+CMD python main.py
