@@ -1,6 +1,12 @@
-version: "3"
 services:
-  api:
+  worker:
     build: .
-    ports:
-      - 8080:8080
+    restart: always
+    resources:
+      cpu: 1000m
+      memory: 3Gi
+
+
+
+
+
