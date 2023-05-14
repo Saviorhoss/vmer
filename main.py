@@ -3,7 +3,12 @@
 # Coded by a Nub.
 # Don't Laugh seeing the codes.
 # Me learning.
+from dotenv import load_dotenv
 
+load_dotenv(
+    "config.env",
+    override=True,
+)
 import os
 import sys
 import time
