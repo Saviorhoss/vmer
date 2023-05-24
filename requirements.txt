@@ -1,4 +1,4 @@
-pyrogram==4.1.16
+pyrogram==1.4.16
 TgCrypto
 hachoir
 Pillow
